@@ -2,6 +2,7 @@
   "name": "mad-city-ffl",
   "version": "1.0.0",
   "description": "Payout tracker for the Mad City fantasy football league, built on the Sleeper API.",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "ng": "ng",

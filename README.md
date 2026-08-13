@@ -249,3 +249,13 @@ browser, no key needed. Week 5's scores are at
 `https://api.sleeper.app/v1/league/<league-id>/matchups/5`. The `starters` array lines up
 index for index with `roster_positions` from `https://api.sleeper.app/v1/league/<league-id>`,
 which is how the flex slot gets identified.
+
+---
+
+## License
+
+MIT, see [LICENSE](LICENSE). Use it, change it, run it for your own league. The only thing
+asked in return is that the copyright notice stays with it.
+
+If you do point it at a different league, everything you need to change is in
+`src/league.config.json`. Nothing about my league is hardcoded anywhere else.
