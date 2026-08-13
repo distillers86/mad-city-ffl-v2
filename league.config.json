@@ -1,0 +1,59 @@
+{
+  "league": {
+    "name": "Mad City FFL",
+    "sleeperUsername": "distillers86",
+    "sport": "nfl",
+    "firstTrackedSeason": 2022,
+    "fallbackLeagueId": "1257103534021693440"
+  },
+
+  "defaults": {
+    "payouts": {
+      "weeklyTopTeam": {
+        "label": "Weekly Top Score",
+        "description": "Highest scoring team each week",
+        "amount": 25
+      },
+      "weeklyTopPlayer": {
+        "label": "Weekly Top Player",
+        "description": "Highest scoring starter at the week's position",
+        "amount": 15
+      },
+      "seasonHighTotal": {
+        "label": "Season High Total",
+        "description": "Team with the highest cumulative score across the regular season",
+        "amount": 100
+      },
+      "playoffs": {
+        "first":  { "label": "1st Place", "amount": 300 },
+        "second": { "label": "2nd Place", "amount": 140 },
+        "third":  { "label": "3rd Place", "amount": 100 }
+      }
+    },
+
+    "weeklyPositionRotation": [
+      { "week": 1,  "label": "QB",        "slots": ["QB"] },
+      { "week": 2,  "label": "RB",        "slots": ["RB"] },
+      { "week": 3,  "label": "WR",        "slots": ["WR"] },
+      { "week": 4,  "label": "DEF",       "slots": ["DEF"] },
+      { "week": 5,  "label": "Flex",      "slots": ["FLEX"] },
+      { "week": 6,  "label": "TE",        "slots": ["TE"] },
+      { "week": 7,  "label": "QB",        "slots": ["QB"] },
+      { "week": 8,  "label": "RB",        "slots": ["RB"] },
+      { "week": 9,  "label": "WR",        "slots": ["WR"] },
+      { "week": 10, "label": "DEF",       "slots": ["DEF"] },
+      { "week": 11, "label": "Flex",      "slots": ["FLEX"] },
+      { "week": 12, "label": "TE",        "slots": ["TE"] },
+      { "week": 13, "label": "Any",       "anyPosition": true },
+      { "week": 14, "label": "QB + Flex", "slots": ["QB", "FLEX"] }
+    ]
+  },
+
+  "seasons": [
+    { "year": 2026 },
+    { "year": 2025 },
+    { "year": 2024 },
+    { "year": 2023 },
+    { "year": 2022 }
+  ]
+}
