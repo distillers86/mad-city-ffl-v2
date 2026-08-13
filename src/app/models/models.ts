@@ -206,7 +206,17 @@ export interface WeeklyWinner {
 
   topTeam: Team | null;
   topTeamScore: number;
-  topPlayer: StarterScore | null;
+
+  /**
+   * The player or players that won the position award. Usually one, but a combined week
+   * like "QB + Flex" is won by a pair, and both of them are worth showing since both
+   * contributed to the total.
+   */
+  topPlayers: StarterScore[];
+
+  /** What the award was actually won with: one player's score, or the combined total. */
+  topPlayerScore: number;
+
   topPlayerTeam: Team | null;
 }
 
@@ -266,6 +276,18 @@ export interface WeekRotation {
 
   /** Every starter is eligible and both lists above get ignored. */
   anyPosition?: boolean;
+
+  /**
+   * Add the eligible slots together per team instead of looking for one standout player.
+   *
+   * This is what a combined week like "QB + Flex" actually means: whichever team has the
+   * best QB and flex **added together** takes it. Without this the award goes to whoever
+   * owns the single highest scorer, which is a different question and picks a different
+   * team often enough to matter.
+   *
+   * Only makes sense alongside `slots`.
+   */
+  combined?: boolean;
 }
 
 export interface PayoutTier {

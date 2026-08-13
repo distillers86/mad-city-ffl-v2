@@ -115,7 +115,7 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
                   <span class="trophy">👑</span>
                   Position of the Week: {{ currentWinner()!.positionLabel }}
                 </div>
-                @if (currentWinner()!.topPlayer) {
+                @if (currentWinner()!.topPlayers.length) {
                   <div class="card-hero">
                     @if (currentWinner()!.topPlayerTeam; as owner) {
                       <img class="avatar" [src]="owner.avatarUrl" [alt]="owner.teamName" (error)="onImgError($event)">
@@ -125,18 +125,24 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
                       <div class="hero-sub">{{ currentWinner()!.topPlayerTeam?.ownerName ?? '' }}</div>
                     </div>
                     <div class="hero-score">
-                      <span class="score-big">{{ currentWinner()!.topPlayer!.score | number:'1.2-2' }}</span>
+                      <span class="score-big">{{ currentWinner()!.topPlayerScore | number:'1.2-2' }}</span>
                       <span class="score-label">pts</span>
                     </div>
                   </div>
 
+                  <!-- A combined week is won by two players, so both get a row and the
+                       header says the score above is the two of them added together. -->
                   <div class="starters-list">
-                    <div class="starters-header">Top {{ currentWinner()!.positionLabel }}</div>
-                    <div class="starter-row">
-                      <span class="pos-chip" [attr.data-pos]="currentWinner()!.topPlayer!.position">{{ currentWinner()!.topPlayer!.position }}</span>
-                      <span class="starter-name">{{ currentWinner()!.topPlayer!.playerName }}</span>
-                      <span class="starter-score">{{ currentWinner()!.topPlayer!.score | number:'1.2-2' }}</span>
+                    <div class="starters-header">
+                      Top {{ currentWinner()!.positionLabel }}{{ currentWinner()!.topPlayers.length > 1 ? ' (combined)' : '' }}
                     </div>
+                    @for (p of currentWinner()!.topPlayers; track p.playerId) {
+                      <div class="starter-row">
+                        <span class="pos-chip" [attr.data-pos]="p.position">{{ p.position }}</span>
+                        <span class="starter-name">{{ p.playerName }}</span>
+                        <span class="starter-score">{{ p.score | number:'1.2-2' }}</span>
+                      </div>
+                    }
                   </div>
                 } @else {
                   <p class="empty-state">No {{ currentWinner()!.positionLabel }} scores recorded.</p>

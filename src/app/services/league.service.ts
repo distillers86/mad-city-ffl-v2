@@ -307,7 +307,8 @@ export class LeagueService {
         positionLabel: rotation.label,
         topTeam: null,
         topTeamScore: 0,
-        topPlayer: null,
+        topPlayers: [],
+        topPlayerScore: 0,
         topPlayerTeam: null,
       };
 
@@ -319,18 +320,35 @@ export class LeagueService {
       // Nobody has scored yet, so there's no winner to show even though the week is live.
       if (topMatchup.totalScore <= 0) return empty;
 
-      let topPlayer: StarterScore | null = null;
+      let topPlayers: StarterScore[] = [];
       let topPlayerTeam: Team | null = null;
-      let bestScore = -Infinity;
+
+      // Starting at 0 rather than -Infinity means a week where nobody scored has no winner,
+      // instead of handing the award to an empty lineup slot sitting on zero.
+      let bestScore = 0;
 
       for (const matchup of matchups) {
-        for (const starter of this.eligibleStarters(matchup.starters, rotation)) {
-          // Has to actually beat the current best, and a zero doesn't count. Without that
-          // check an empty lineup slot scoring 0 could end up named as the winner.
-          if (starter.score > bestScore && starter.score > 0) {
-            bestScore = starter.score;
-            topPlayer = starter;
+        const eligible = this.eligibleStarters(matchup.starters, rotation);
+        if (eligible.length === 0) continue;
+
+        if (rotation.combined) {
+          // A combined week is won by the team, not by one player. Add the eligible slots
+          // together and compare those totals, so "QB + Flex" means whoever had the best
+          // QB and flex between them rather than whoever owned the single biggest score.
+          const total = eligible.reduce((sum, s) => sum + s.score, 0);
+
+          if (total > bestScore) {
+            bestScore = total;
+            topPlayers = eligible;
             topPlayerTeam = teamsById.get(matchup.teamId) ?? null;
+          }
+        } else {
+          for (const starter of eligible) {
+            if (starter.score > bestScore) {
+              bestScore = starter.score;
+              topPlayers = [starter];
+              topPlayerTeam = teamsById.get(matchup.teamId) ?? null;
+            }
           }
         }
       }
@@ -341,7 +359,8 @@ export class LeagueService {
         positionLabel: rotation.label,
         topTeam: teamsById.get(topMatchup.teamId) ?? null,
         topTeamScore: topMatchup.totalScore,
-        topPlayer,
+        topPlayers,
+        topPlayerScore: bestScore,
         topPlayerTeam,
       };
     });
