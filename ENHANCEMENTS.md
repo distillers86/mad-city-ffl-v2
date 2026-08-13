@@ -59,6 +59,54 @@ doing on its own rather than mixed in with real changes.
 ---
 
 
+## Decide what happens on a tie
+
+Nothing in the weekly awards has a tiebreaker. Right now whoever Sleeper happens to list
+first in the matchups response wins, because the comparison is a plain `>` and the first
+team to set the high score keeps it. That's not random, it'll give the same answer every
+time for the same data, but it is arbitrary and there's no rule behind it.
+
+It has never come up in four seasons and probably never will, but it's undefined rather
+than decided, and it's the kind of thing that would cause an argument at exactly the wrong
+moment.
+
+**The plan for the top player award, including combined weeks:** if two teams tie on the
+position of the week score, fall back to their **weekly total team score** and give it to
+whichever of them scored more overall that week. That's already on the same page, so it
+can be explained to the league without anyone having to go digging.
+
+**The plan for the top team award:** the tiebreaker above can't be reused, since the weekly
+team score *is* what tied. So fall back to season points for, meaning the running total of
+what that team has scored for itself, and give it to whoever is higher.
+
+One decision to make before building that, because it changes whether a result can move
+after the fact:
+
+- **Points for through that week only.** Once the week is done the tiebreak is settled and
+  never changes again. This is the one I'd go with.
+- **Points for across the whole season.** A tie in week 3 would stay unresolved until the
+  season ends, and the winner could flip in week 10 as totals move. That means telling
+  somebody they won and then taking it back, which is worth avoiding.
+
+The app already computes cumulative points for in `computeSeasonTotals`, it just does it
+across every week rather than up to a given one, so this is a small change rather than new
+machinery. Sleeper also exposes an official figure on each roster as
+`settings.fpts` plus `settings.fpts_decimal` (so 1550 and 24 means 1550.24), but that's a
+final season number with no per-week breakdown, so it can't answer "as of week 3". Better
+to keep computing it from the matchups, which also keeps it consistent with the totals
+already shown on the Total Scores page.
+
+**The thing that actually worries me about leaving it undefined:** with no tiebreaker, the
+winner is whichever tied team came first in Sleeper's response. If that ordering isn't
+guaranteed to be stable between calls, then hitting Refresh could show a different winner
+than a moment earlier, with nothing having changed. Two people looking at the same week on
+the same day could see different names. Worth checking whether Sleeper's matchup ordering
+is actually stable before deciding how much any of this matters.
+
+Whatever gets decided, both tiebreakers should be built in the same pass so the behaviour
+is consistent, and the rules should be written into the README so nobody has to read the
+code to find out how a tie resolves.
+
 ## Soften the player list re-download during the season
 
 The player list from Sleeper is 2.5MB gzipped, 15MB raw, and it's over 95% of all the data
