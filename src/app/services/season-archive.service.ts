@@ -38,7 +38,7 @@ export class SeasonArchiveService {
     return this.http.get<ArchivedSeason>(`seasons/${year}.json`).pipe(
       map(archive => {
         if (archive?.formatVersion !== ARCHIVE_FORMAT_VERSION) {
-          console.warn(`seasons/${year}.json is version ${archive?.formatVersion} but this app expects ${ARCHIVE_FORMAT_VERSION}, so it's being ignored in favour of the API.`);
+          console.warn(`seasons/${year}.json is version ${archive?.formatVersion} but this app expects ${ARCHIVE_FORMAT_VERSION}, so it's being ignored and the API is used instead.`);
           return null;
         }
         return archive;
