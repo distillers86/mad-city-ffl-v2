@@ -81,14 +81,17 @@ export class LeagueService {
   loadSeason(year: number, forceRefresh = false): Observable<LeagueData> {
     if (forceRefresh) {
       this.loadedSeasons.delete(year);
-      this.sleeper.clearPlayerCache();
       this.seasonIndex.clearCache();
+
+      // The player cache deliberately isn't cleared here. Whether it's even relevant
+      // depends on where this season's data comes from, and that isn't known yet, so the
+      // decision happens further down in fetchSeason once the archive has been checked.
     }
 
     const existing = this.loadedSeasons.get(year);
     if (existing) return existing;
 
-    const load$ = this.fetchSeason(year).pipe(
+    const load$ = this.fetchSeason(year, forceRefresh).pipe(
       // refCount stays false so the result sticks around after a page unsubscribes.
       // Otherwise navigating away would throw it out and the next page would refetch.
       shareReplay({ bufferSize: 1, refCount: false }),
@@ -104,7 +107,7 @@ export class LeagueService {
     return load$;
   }
 
-  private fetchSeason(year: number): Observable<LeagueData> {
+  private fetchSeason(year: number, forceRefresh = false): Observable<LeagueData> {
     return this.config$.pipe(
       switchMap(config =>
         this.seasonIndex.getSeasons(config).pipe(
@@ -118,11 +121,18 @@ export class LeagueService {
 
             // Archived first. A finished season saved to disk never needs the API again.
             return this.archive.load(year).pipe(
-              switchMap(archived =>
-                archived
-                  ? of(this.fromArchive(archived, seasonConfig))
-                  : this.fromApi(config, seasonConfig)
-              )
+              switchMap(archived => {
+                if (archived) return of(this.fromArchive(archived, seasonConfig));
+
+                // Only a season coming from the API cares about player names, so this is
+                // the only place a refresh should throw that cache away. Doing it up in
+                // loadSeason meant hitting Refresh on an archived season binned the whole
+                // 2.5MB player list for nothing, and the next live season then had to pull
+                // it down again.
+                if (forceRefresh) this.sleeper.clearPlayerCache();
+
+                return this.fromApi(config, seasonConfig);
+              })
             );
           })
         )

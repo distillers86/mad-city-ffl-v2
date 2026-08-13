@@ -104,7 +104,12 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
                 }
               </div>
 
-              <!-- Top Player Card -->
+              <!--
+                Built to mirror the Top Scoring Team card next to it. Both awards are won by
+                a team, not by a player, so both cards lead with the team name and then show
+                the detail underneath. The player who actually did it is the supporting line
+                here, the same way the top starters are on the other card.
+              -->
               <div class="winner-card accent-card">
                 <div class="card-eyebrow">
                   <span class="trophy">👑</span>
@@ -112,20 +117,26 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
                 </div>
                 @if (currentWinner()!.topPlayer) {
                   <div class="card-hero">
-                    <div class="pos-bubble" [attr.data-pos]="currentWinner()!.topPlayer!.position">
-                      {{ currentWinner()!.topPlayer!.position }}
-                    </div>
+                    @if (currentWinner()!.topPlayerTeam; as owner) {
+                      <img class="avatar" [src]="owner.avatarUrl" [alt]="owner.teamName" (error)="onImgError($event)">
+                    }
                     <div class="card-hero-info">
-                      <div class="hero-name">{{ currentWinner()!.topPlayer!.playerName }}</div>
-                      <div class="hero-sub">Owned by {{ currentWinner()!.topPlayerTeam?.teamName ?? '-' }}</div>
+                      <div class="hero-name">{{ currentWinner()!.topPlayerTeam?.teamName ?? 'Unknown team' }}</div>
+                      <div class="hero-sub">{{ currentWinner()!.topPlayerTeam?.ownerName ?? '' }}</div>
                     </div>
                     <div class="hero-score">
                       <span class="score-big">{{ currentWinner()!.topPlayer!.score | number:'1.2-2' }}</span>
                       <span class="score-label">pts</span>
                     </div>
                   </div>
-                  <div class="payout-note">
-                    Earns <strong>\${{ config()!.payouts.weeklyTopPlayer.amount }}</strong>
+
+                  <div class="starters-list">
+                    <div class="starters-header">Top {{ currentWinner()!.positionLabel }}</div>
+                    <div class="starter-row">
+                      <span class="pos-chip" [attr.data-pos]="currentWinner()!.topPlayer!.position">{{ currentWinner()!.topPlayer!.position }}</span>
+                      <span class="starter-name">{{ currentWinner()!.topPlayer!.playerName }}</span>
+                      <span class="starter-score">{{ currentWinner()!.topPlayer!.score | number:'1.2-2' }}</span>
+                    </div>
                   </div>
                 } @else {
                   <p class="empty-state">No {{ currentWinner()!.positionLabel }} scores recorded.</p>
@@ -209,7 +220,6 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
 
     .card-hero { display: flex; align-items: center; gap: 0.875rem; margin-bottom: 1rem; }
     .avatar { width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--border); object-fit: cover; flex-shrink: 0; background: var(--surface-hover); }
-    .pos-bubble { width: 52px; height: 52px; border-radius: 50%; background: var(--accent-dim); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; }
 
     .card-hero-info { flex: 1; min-width: 0; }
     .hero-name { font-size: 1rem; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -232,8 +242,6 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
     .starter-name { flex: 1; font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .starter-score { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 
-    .payout-note { font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border); padding-top: 0.875rem; margin-top: 0.25rem; }
-    .payout-note strong { color: var(--accent); }
 
     .empty-state { color: var(--text-muted); font-size: 0.875rem; padding: 1rem 0; }
 
@@ -259,7 +267,7 @@ import type { WeeklyWinner, ResolvedSeasonConfig, WeekMatchup, SeasonState } fro
 
       .hero-name { white-space: normal; overflow: visible; overflow-wrap: anywhere; line-height: 1.25; }
       .score-big { font-size: 1.5rem; }
-      .avatar, .pos-bubble { width: 46px; height: 46px; }
+      .avatar { width: 46px; height: 46px; }
     }
   `]
 })

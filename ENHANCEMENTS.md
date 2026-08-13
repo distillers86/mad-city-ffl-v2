@@ -59,6 +59,24 @@ doing on its own rather than mixed in with real changes.
 ---
 
 
+## Soften the player list re-download during the season
+
+The player list from Sleeper is 2.5MB gzipped, 15MB raw, and it's over 95% of all the data
+this app moves. Everything else put together, the whole app bundle and every API call and
+browsing every past season, is a rounding error next to it.
+
+Out of season that's fine, since it comes down once a day at most. In season it will fire
+more often than that, because the cache also gives up whenever somebody starts a player it
+hasn't seen before. Any waiver pickup across all twelve teams that reaches a starting
+lineup means every user pulls the full list again.
+
+That's the correct behaviour, since it's what stops a new player showing as "Unknown". But
+if it turns out to be annoying on mobile data during the season, the fix is to stop
+treating an unknown ID as a hard miss: serve what's cached, show the unknown player by ID
+for a moment, and refresh the list in the background rather than blocking the page on it.
+
+Worth measuring before building. It might not be a real problem.
+
 ## Archive the older seasons
 
 `src/seasons/2023.json` exists as a worked example. The other finished seasons (2022, 2024,
