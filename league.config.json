@@ -45,7 +45,7 @@
       { "week": 11, "label": "Flex",      "slots": ["FLEX"] },
       { "week": 12, "label": "TE",        "slots": ["TE"] },
       { "week": 13, "label": "Any",       "anyPosition": true },
-      { "week": 14, "label": "QB + Flex", "slots": ["QB", "FLEX"] }
+      { "week": 14, "label": "QB + Flex", "slots": ["QB", "FLEX"], "combined": true }
     ]
   },
 
